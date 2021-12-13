@@ -25,6 +25,7 @@ const renderItemContent = ({
 }: RenderItemContentProps) => {
   const editorJSHolderID = uuidv4();
   const wrapper = document.createElement("div");
+  wrapper.classList.add('editor-custom-wrapper');
 
   wrapper.id = editorJSHolderID;
 
@@ -36,6 +37,8 @@ const renderItemContent = ({
         EditorJS,
         data,
         editorJSConfig,
+        item: wrapper,
+        id: wrapper.id,
         onClose: async ({ editorJSData }) =>
           dispatchData(({ itemContent, layout }) => ({
             itemContent: {
@@ -48,8 +51,7 @@ const renderItemContent = ({
           })),
       });
 
-      document.body.append(dialog);
-      dialog.showModal();
+      dialog.append(wrapper);
     });
   }
 

@@ -7,60 +7,68 @@ const createDialog = ({
   EditorJS,
   data,
   editorJSConfig,
+  item,
+  id,
   onClose,
 }: {
   EditorJS: LayoutBlockToolConfig["EditorJS"];
   data: OutputData;
   editorJSConfig: LayoutBlockToolConfig["editorJSConfig"];
+  item: HTMLDivElement | HTMLElement;
+  id: string;
   onClose?: (event: { editorJSData: OutputData }) => void;
 }) => {
-  const dialog = document.createElement("dialog");
+  // const dialog = document.createElement("div");
+  // dialog.classList.add('edit-custom-block')
 
-  dialogPolyfill.registerDialog(dialog);
+  // dialogPolyfill.registerDialog(dialog);
 
-  dialog.style.maxWidth = "960px";
-  // Make be not able to click inner
-  dialog.style.padding = "0";
-  dialog.style.width = "calc(100% - 64px)";
+  // dialog.style.maxWidth = "960px";
+  // // Make be not able to click inner
+  // dialog.style.padding = "0";
+  // dialog.style.width = "calc(100% - 64px)";
 
-  const editorJSHolder = document.createElement("div");
-  const editorJSHolderID = uuidv4();
-
-  editorJSHolder.id = editorJSHolderID;
-
-  dialog.append(editorJSHolder);
+  // const editorJSHolder = document.createElement("div");
+  // const editorJSHolderID = uuidv4();
+  //
+  // editorJSHolder.id = editorJSHolderID;
+  //
+  // dialog.append(editorJSHolder);
 
   const editorJS = new EditorJS({
     ...editorJSConfig,
-    holder: editorJSHolderID,
-    data,
+    holder: id
   });
 
-  const handleDialogClick = (event: MouseEvent) => {
-    if (!(event.target instanceof Node) || !event.target.isEqualNode(dialog)) {
-      return;
-    }
-
-    dialog.close();
-  };
-
-  dialog.addEventListener("click", handleDialogClick);
+  // const handleDialogClick = (event: MouseEvent) => {
+  //   if (!(event.target instanceof Node) || !event.target.isEqualNode(dialog)) {
+  //     return;
+  //   }
+  //
+  //   dialog.classList.remove('edit-custom-block');
+  // };
+  //
+  // dialog.addEventListener("click", handleDialogClick);
 
   const handleDialogClose = async () => {
     const editorJSData = await editorJS.save();
 
     editorJS.destroy();
 
-    dialog.removeEventListener("click", handleDialogClick);
-    dialog.removeEventListener("close", handleDialogClose);
-    dialog.remove();
+    // dialog.removeEventListener("click", handleDialogClick);
+    // dialog.removeEventListener("close", handleDialogClose);
+    // dialog.remove();
 
     onClose?.({ editorJSData });
   };
 
-  dialog.addEventListener("close", handleDialogClose);
+  document.addEventListener("click", function(e) {
+    if(e.target != item)
+    handleDialogClose;
+  });
 
-  return dialog;
+
+  return item;
 };
 
 export { createDialog };
