@@ -30,29 +30,29 @@ const renderItemContent = ({
   wrapper.id = editorJSHolderID;
 
   if (!readOnly) {
-    wrapper.style.cursor = "pointer";
-
-    wrapper.addEventListener("click", () => {
-      const dialog = createDialog({
-        EditorJS,
-        data,
-        editorJSConfig,
-        item: wrapper,
-        id: wrapper.id,
-        onClose: async ({ editorJSData }) =>
-          dispatchData(({ itemContent, layout }) => ({
-            itemContent: {
-              ...itemContent,
-              [itemContentId]: {
-                blocks: editorJSData.blocks,
-              },
-            },
-            layout: layout,
-          })),
-      });
-
-      dialog.append(wrapper);
-    });
+    // wrapper.style.cursor = "pointer";
+    //
+    // wrapper.addEventListener("click", () => {
+    //   const dialog = createDialog({
+    //     EditorJS,
+    //     data,
+    //     editorJSConfig,
+    //     item: wrapper,
+    //     id: wrapper.id,
+    //     onClose: async ({ editorJSData }) =>
+    //       dispatchData(({ itemContent, layout }) => ({
+    //         itemContent: {
+    //           ...itemContent,
+    //           [itemContentId]: {
+    //             blocks: editorJSData.blocks,
+    //           },
+    //         },
+    //         layout: layout,
+    //       })),
+    //   });
+    //
+    //   dialog.append(wrapper);
+    // });
   }
 
   new EditorJS({
