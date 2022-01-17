@@ -1,0 +1,157 @@
+import type EditorJS from "./assets/editorjs";
+import type {
+  BlockTool,
+  BlockToolConstructorOptions,
+  EditorConfig,
+} from "./assets/editorjs";
+import { renderContainer } from "./containerCustom";
+import type {
+  LayoutBlockContainerData,
+} from "./container";
+import type {
+  LayoutBlockItemContentData,
+} from "./itemContent";
+
+type OnFocusBlockInterface = ( index: number, holder: string ) => void;
+
+interface LayoutBlockToolConfig {
+  EditorJS: typeof EditorJS;
+  editorJSConfig: Omit<
+    EditorConfig,
+    "holder" | "data" | "minHeight" | "readOnly"
+  >;
+  /** Reserved flag for the future */
+  enableLayoutEditing: false;
+  enableLayoutSaving: boolean;
+  initialData: ValidatedLayoutBlockToolData;
+  onFocusBlock?: OnFocusBlockInterface;
+}
+
+import {
+  LayoutBlockToolData,
+  ValidatedLayoutBlockToolData,
+  LayoutBlockToolDispatchData} from "./LayoutBlockTool";
+
+class LayoutBlockTool implements BlockTool {
+  static get isReadOnlySupported() {
+    return true;
+  }
+
+  static get shortcut() {
+    return "CMD+L";
+  }
+
+  static get toolbox() {
+    return {
+      icon: `
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512">
+          <rect x="48" y="48" width="176" height="176" rx="20" ry="20" style="fill:none;stroke:#000;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/>
+          <rect x="288" y="48" width="176" height="176" rx="20" ry="20" style="fill:none;stroke:#000;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/>
+          <rect x="48" y="288" width="176" height="176" rx="20" ry="20" style="fill:none;stroke:#000;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/>
+          <rect x="288" y="288" width="176" height="176" rx="20" ry="20" style="fill:none;stroke:#000;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/>
+        </svg>
+      `,
+      title: "Layout",
+    };
+  }
+
+  #config!: LayoutBlockToolConfig;
+  #readOnly: boolean;
+  #wrapper: HTMLDivElement;
+
+  #itemContent: LayoutBlockItemContentData;
+  #layout: LayoutBlockContainerData;
+
+  constructor({
+                config,
+                data,
+                readOnly,
+              }: BlockToolConstructorOptions<LayoutBlockToolData, LayoutBlockToolConfig>) {
+    this.#readOnly = readOnly;
+    this.#wrapper = document.createElement("div");
+
+    this.#itemContent = {};
+
+    this.#layout = {
+      type: "container",
+      id: "",
+      className: "",
+      style: "",
+      children: [],
+    };
+
+    // Filter undefined and empty object.
+    // See also: https://github.com/codex-team/editor.js/issues/1432
+    if (config && "EditorJS" in config) {
+      this.#config = config;
+      this.#itemContent = config.initialData.itemContent;
+
+      if (config.initialData.layout) {
+        this.#layout = config.initialData.layout;
+      }
+    }
+
+    // Filter undefined and empty object.
+    // See also: https://github.com/codex-team/editor.js/issues/1432
+    if (data && "itemContent" in data) {
+      this.#itemContent = data.itemContent;
+
+      if (data.layout) {
+        this.#layout = data.layout;
+      }
+    }
+  }
+
+  render() {
+    this.renderWrapper();
+
+    return this.#wrapper;
+  }
+
+  save(): LayoutBlockToolData {
+    return {
+      itemContent: this.#itemContent,
+      layout: this.#config.enableLayoutSaving ? this.#layout : undefined,
+    };
+  }
+
+  validate(data: LayoutBlockToolData) {
+    const compatibilityCheck: ValidatedLayoutBlockToolData = data;
+
+    return true;
+  }
+
+  #dispatchData: LayoutBlockToolDispatchData = (action) => {
+    const data = action({
+      itemContent: this.#itemContent,
+      layout: this.#layout,
+    });
+
+    this.#itemContent = data.itemContent;
+    this.#layout = data.layout;
+  };
+
+  renderWrapper() {
+    this.#wrapper.innerHTML = "";
+
+    this.#wrapper.append(
+        renderContainer({
+          EditorJS: this.#config.EditorJS,
+          data: this.#layout,
+          dispatchData: this.#dispatchData,
+          editorJSConfig: this.#config.editorJSConfig,
+          itemContentData: this.#itemContent,
+          readOnly: this.#readOnly,
+          onFocusBlock: this.#config.onFocusBlock,
+        })
+    );
+  }
+}
+
+export { LayoutBlockTool };
+export type {
+  LayoutBlockToolConfig,
+  LayoutBlockToolData,
+  LayoutBlockToolDispatchData,
+  ValidatedLayoutBlockToolData,
+};

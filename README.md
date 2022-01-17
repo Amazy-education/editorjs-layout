@@ -113,3 +113,11 @@ Please see also [DISCLAIMER.md](https://github.com/hata6502/editorjs-layout/blob
 ---
 
 _This README was generated with ❤️ by [readme-md-generator](https://github.com/kefranabg/readme-md-generator)_
+
+---
+
+install before use
+
+npm install -D webpack-dev-server ts-loader file-loader html-webpack-plugin html-loader raw-loader
+
+npm link webpack
