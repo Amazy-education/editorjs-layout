@@ -41,7 +41,7 @@ const createDialog = ({
       return;
     }
 
-    dialog.close();
+    // dialog.close();
   };
 
   dialog.addEventListener("click", handleDialogClick);

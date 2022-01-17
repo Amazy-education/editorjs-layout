@@ -49,7 +49,7 @@ const renderItemContent = ({
       });
 
       document.body.append(dialog);
-      dialog.showModal();
+      // dialog.showModal();
     });
   }
 
